@@ -14,6 +14,5 @@ jobs:
     - name: each line references a commit
       env:
         BASE_REF: ${{ github.event.pull_request.base.ref }}
-      if: ${{ git diff --exit-code origin/$BASE_REF -- .git-blame-ignore-revs }}
       run: |
         (while read line; do if ! git branch --contains $line | grep origin/$BASE_REF; then exit 1; fi; done < .git-blame-ignore-revs )
