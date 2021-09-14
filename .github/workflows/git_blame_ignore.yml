@@ -13,4 +13,5 @@ jobs:
 
     - name: each line references a commit
       run: |
-        (while read line; do if ! git branch --contains $line | grep origin/$GITHUB_HEAD_REF; then exit 1; fi; done < .git-blame-ignore-revs )
+        echo $GITHUB_HEAD_REF
+        (while read line; echo @line do if ! git branch --contains $line | grep origin/$GITHUB_HEAD_REF; then exit 1; fi; done < .git-blame-ignore-revs )
