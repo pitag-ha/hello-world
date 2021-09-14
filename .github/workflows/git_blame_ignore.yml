@@ -1,4 +1,4 @@
-name: .git-blame-ignore-revs check
+name: git-blame-ignore-revs check
 
 on:
   pull_request:
@@ -11,7 +11,23 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    - name: each line references a commit
+    - name: Check that each line in .git-blame-ignore-revs references a commit in the PR branch
       run: |
-        echo $GITHUB_HEAD_REF
-        (while read line; echo @line do if ! git branch --contains $line | grep origin/$GITHUB_HEAD_REF; then exit 1; fi; done < .git-blame-ignore-revs )
+        ( while read line || [ -n "$line" ]; do
+            if ! git branch --contains $line | grep ${GITHUB_REF#*/} > /dev/null
+              then
+                echo "Line $line in .git-blame-ignore-revs doesn't reference any commit in the history of the PR branch"
+                exit 1
+            fi
+          done < .git-blame-ignore-revs )
+
+    - name: Check that each line in .git-blame-ignore-revs references a commit in the main branch
+      run: |
+        echo "chopped GITHUB_BASE_REF: " ${GITHUB_BASE_REF#*/}
+        ( while read line || [ -n "$line" ]; do
+            if ! git branch --contains $line | grep ${GITHUB_BASE_REF#*/} > /dev/null
+              then
+                echo "Line $line in .git-blame-ignore-revs doesn't reference any commit in the history of main"
+                exit 1
+            fi
+          done < .git-blame-ignore-revs )
