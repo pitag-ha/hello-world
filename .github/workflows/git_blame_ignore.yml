@@ -16,7 +16,7 @@ jobs:
         ( while read line || [ -n "$line" ]; do
             if ! git branch --contains $line | grep ${GITHUB_REF#*/} > /dev/null
               then
-                echo "Line $line in .git-blame-ignore-revs doesn't reference any commit in the history of the PR branch"
+                echo "Line $line in .git-blame-ignore-revs doesn't reference any commit in PR branch"
                 exit 1
             fi
           done < .git-blame-ignore-revs )
@@ -25,9 +25,9 @@ jobs:
       run: |
         echo "chopped GITHUB_BASE_REF: " ${GITHUB_BASE_REF#*/}
         ( while read line || [ -n "$line" ]; do
-            if ! git branch --contains $line | grep ${GITHUB_BASE_REF#*/} > /dev/null
+            if ! git branch --all --contains $line | grep ${GITHUB_BASE_REF#*/}
               then
-                echo "Line $line in .git-blame-ignore-revs doesn't reference any commit in the history of main"
+                echo "Line $line in .git-blame-ignore-revs doesn't reference any commit in branch main"
                 exit 1
             fi
           done < .git-blame-ignore-revs )
